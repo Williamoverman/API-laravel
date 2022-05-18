@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\ParseError;
 
 class Handler extends ExceptionHandler
 {
@@ -33,14 +34,25 @@ class Handler extends ExceptionHandler
      *
      * @return void
      */
-    public function register()
-    {
+    public function register() {
+
         $this->renderable(function (NotFoundHttpException $e, $request) {
             return response()->json([
+                'error' => 'NotFoundHttpException',
                 'message' => 'Route not found',
                 'response_code' => 404
             ], 404);
         });
+        
+        $this->renderable(function (ParseError $e, $request) {
+            return response()->json([
+                'error' => 'ParseError',
+                'message' => 'Trying to delete a product that doesnt exist',
+                'response_code' => 500
+            ], 500);
+        });
+
     }
+
 }
 
