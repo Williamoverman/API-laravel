@@ -51,7 +51,14 @@ class Handler extends ExceptionHandler
                 'response_code' => 500
             ], 500);
         });
-
+        
+        $this->renderable(function (ModuleNotFoundException $e, $request) {
+            return response()->json([
+                'error' => 'ModuleNotFoundException',
+                'message' => 'Module not found',
+                'response_code' => 404
+            ], 404);
+        });
     }
 
 }
