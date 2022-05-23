@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Log;
+
 use Illuminate\Htpp\Request;
 use App\Models\Model\Product;
 use App\Http\Resources\Product\ProductCollection;
@@ -23,6 +25,10 @@ class ProductController extends Controller
      */
     public function index()
     {
+        Log::channel('api')->info('User requested a GET', [
+            'user' => "localhost" 
+        ]);
+
         return Product::all();
     }
 
@@ -44,6 +50,11 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
+        Log::channel('api')->info('User stored a product', [
+            'user' => "localhost",
+            'product_name' => $request->name
+        ]);
+
         $product = new Product;
         $product->name = $request->name;
         $product->detail = $request->description;
@@ -64,6 +75,10 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
+        Log::channel('api')->info('User requested a singular GET', [
+            'user' => "localhost" 
+        ]);
+
         return new ProductResource($product);
     }
 
@@ -87,8 +102,16 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $request['detail'] = $request->description;
-        unset($request['description']);
+        Log::channel('api')->info('User updated a product', [
+            'user' => "localhost",
+            'product_id' => $product->id,
+            'product_name' => $product->name 
+        ]);
+
+        if ($request->description != null) {
+            $request['detail'] = $request->description;
+            unset($request['description']);
+        }
         $product->update($request->all());
         return response([
             'data' => new ProductResource($product)
@@ -103,6 +126,12 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
+        Log::channel('api')->info('User deleted a product', [
+            'user' => "localhost",
+            'product_id' => $product->id,
+            'product_name' => $product->name
+        ]);
+
         $product->delete();
         return response()->json([
             "message" => "Product succesfully destroyed"
