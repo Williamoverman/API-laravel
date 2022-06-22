@@ -11,6 +11,7 @@ use App\Http\Resources\Product\ProductResource;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -25,9 +26,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        Log::channel('api')->info('User requested a GET', [
-            'user' => "localhost" 
-        ]);
+        DB::insert('insert into log_a_p_i_s (request, log_message) values (?, ?)', ['get', 'user requested a get in product']);
 
         return Product::all();
     }
@@ -50,10 +49,7 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        Log::channel('api')->info('User stored a product', [
-            'user' => "localhost",
-            'product_name' => $request->name
-        ]);
+        DB::insert('insert into log_a_p_i_s (request, log_message) values (?, ?)', ['create', 'user requested a create in product']);
 
         $product = new Product;
         $product->name = $request->name;
@@ -102,12 +98,9 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        Log::channel('api')->info('User updated a product', [
-            'user' => "localhost",
-            'product_id' => $product->id,
-            'product_name' => $product->name 
-        ]);
-
+        DB::insert('insert into log_a_p_i_s (request, log_message) values (?, ?)', ['put', 'user requested a create in product - updated name from:' . $product->name . ' - to: ' . 
+        $request->name . ' - updated detail from: ' . $product->detail . ' - to: ' . $request->detail]);
+        
         if ($request->description != null) {
             $request['detail'] = $request->description;
             unset($request['description']);
@@ -126,11 +119,7 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        Log::channel('api')->info('User deleted a product', [
-            'user' => "localhost",
-            'product_id' => $product->id,
-            'product_name' => $product->name
-        ]);
+        
 
         $product->delete();
         return response()->json([
